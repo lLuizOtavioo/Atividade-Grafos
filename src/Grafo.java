@@ -1,41 +1,74 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Grafo<T> {
-    private List<Vertice<T>> vertices;
-    private List<Aresta<T>> arestas;
-    private boolean direcionado;
 
-    public Grafo(boolean direcionado) {
-        this.vertices = new ArrayList<>();
-        this.arestas = new ArrayList<>();
-        this.direcionado = direcionado;
-    }
+public class Grafo {
 
-    public Vertice<T> adicionarVertice(T dado) {
-        Vertice<T> novoVertice = new Vertice<>(dado);
-        vertices.add(novoVertice);
-        return novoVertice;
-    }
+    private final List<List<Integer>> adjacencia;
 
-    public void adicionarAresta(Vertice<T> origem, Vertice<T> destino, int peso) {
-        Aresta<T> aresta = new Aresta<>(origem, destino, peso);
-        origem.adicionarAresta(aresta);
-        arestas.add(aresta);
 
-        // Se o grafo não for direcionado, cria a aresta no sentido inverso também
-        if (!direcionado) {
-            Aresta<T> arestaInversa = new Aresta<>(destino, origem, peso);
-            destino.adicionarAresta(arestaInversa);
-            arestas.add(arestaInversa);
+    public Grafo(int quantidadeVertices) {
+        adjacencia = new ArrayList<>();
+        for (int i = 0; i < quantidadeVertices; i++) {
+            adjacencia.add(new ArrayList<>());
         }
     }
 
-    public List<Vertice<T>> getVertices() {
-        return vertices;
+
+    public void adicionarAresta(int origem, int destino) {
+        if (origem == destino) {
+            return; // laço não permitido
+        }
+        if (adjacencia.get(origem).contains(destino)) {
+            return; // aresta repetida não permitida
+        }
+        adjacencia.get(origem).add(destino);
+        adjacencia.get(destino).add(origem);
     }
 
-    public List<Aresta<T>> getArestas() {
-        return arestas;
+    public void exibirGrafo() {
+        for (int v = 0; v < adjacencia.size(); v++) {
+            System.out.println(v + " -> " + adjacencia.get(v));
+        }
+    }
+
+
+    public int quantidadeVertices() {
+        return adjacencia.size();
+    }
+
+
+    public int quantidadeArestas() {
+        int soma = 0;
+        for (List<Integer> vizinhos : adjacencia) {
+            soma += vizinhos.size();
+        }
+        return soma / 2;
+    }
+
+
+    public List<Integer> listarVizinhos(int vertice) {
+        return new ArrayList<>(adjacencia.get(vertice));
+    }
+
+
+    public int grau(int vertice) {
+        return adjacencia.get(vertice).size();
+    }
+
+
+    public boolean existeAresta(int origem, int destino) {
+        return adjacencia.get(origem).contains(destino);
+    }
+
+
+    public List<Integer> verticesIsolados() {
+        List<Integer> isolados = new ArrayList<>();
+        for (int v = 0; v < adjacencia.size(); v++) {
+            if (adjacencia.get(v).isEmpty()) {
+                isolados.add(v);
+            }
+        }
+        return isolados;
     }
 }
